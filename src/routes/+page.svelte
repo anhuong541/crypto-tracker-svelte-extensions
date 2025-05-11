@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { coinmarketcapApi } from '$lib/apis'
+
   let resData = $state<any | null>(null)
 
   let selectedSymbol = $state('')
@@ -32,6 +34,7 @@
 
   const deleteToken = async () => {
     // await chromeStorage.clear()
+    // listToken = await chromeStorage.get('myKey')
   }
 </script>
 
