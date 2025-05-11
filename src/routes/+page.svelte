@@ -1,52 +1,70 @@
 <script lang="ts">
   import { coinmarketcapApi } from '$lib/apis'
   import { chromeStorage } from '$lib/utils/chrome'
+  import '$lib/styles/home.css'
+  import { CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
+  import { onMount } from 'svelte'
+  import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
+
+  // TODO: add loading skeleton
+  // TODO: add cache for list token
+  // TODO: check and optimize UI performance
+  // FIXME: fix the type error
+  // FIXME: fix the error still show old data when remove token
 
   let resData = $state<any | null>(null)
 
   let selectedSymbol = $state('')
-  let listToken = $state<string[]>([])
-  let err = $state<any | null>(null)
+  let listToken = $state<{ price: number; img: string; symbol: string }[]>([])
+  let listSymbol = $state<string[]>([])
 
-  // onMount(async () => {
-  //   listToken = await chromeStorage.get('myKey')
-  // })
-
-  $effect(() => {
-    console.log(selectedSymbol)
-  })
-
-  const fetchCryptoListings = async () => {
-    const res = await coinmarketcapApi.get('/cryptocurrency/quotes/latest', {
-      params: {
-        symbol: 'DEEP'
-      }
+  const updateListToken = async (symbol: string) => {
+    const crypto = await getCryptoPrice(symbol)
+    const price = crypto?.data?.[symbol].quote.USD.price
+    const cryptoId = crypto?.data?.[symbol].id
+    const cryptoImg = getCmcImg(cryptoId)
+    listToken.push({
+      price,
+      img: cryptoImg,
+      symbol
     })
-    resData = res
   }
 
-  const submitSelectedSymbol = (e: Event) => {
+  onMount(async () => {
+    const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_TOKEN)
+    listSymbol = Object.values(store)
+    const crypto = await getCryptoPrice('BTC')
+    const price = crypto?.data?.BTC.quote.USD.price
+    const cryptoId = crypto?.data?.BTC.id
+    const cryptoImg = getCmcImg(cryptoId)
+
+    listSymbol.forEach(async symbol => {
+      await updateListToken(symbol)
+    })
+  })
+
+  const updateListSymbolStorage = () => {
+    chromeStorage.set({ [CHROME_STORAGE_KEYS.LIST_TOKEN]: listSymbol })
+  }
+
+  const submitSelectedSymbol = async (e: Event) => {
     e.preventDefault()
-    listToken = [...listToken, selectedSymbol]
+    listSymbol = [...listSymbol, selectedSymbol]
+    updateListSymbolStorage()
+    await updateListToken(selectedSymbol)
     selectedSymbol = ''
-    // chromeStorage.set({ myKey: listToken })
   }
 
   const addToken = async () => {
     // Save a key-value pair
-    try {
-      const myKey = await chromeStorage.get<string[]>('myKey')
-      chromeStorage.set({ myKey: [...myKey, 'selectedSymbol'] }, () => {
-        console.log('Value is set')
-      })
-    } catch (error) {
-      err = error ? error : 'Unknown error'
-    }
+    const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_TOKEN)
+    chromeStorage.set({ [CHROME_STORAGE_KEYS.LIST_TOKEN]: [...store, 'selectedSymbol'] })
   }
 
-  const deleteToken = async () => {
-    // await chromeStorage.clear()
-    listToken = await chromeStorage.get('myKey')
+  const deleteToken = (index: number) => {
+    listSymbol = listSymbol.filter((_, i) => i !== index)
+    listToken = listToken.filter((_, i) => i !== index)
+    updateListSymbolStorage()
   }
 </script>
 
@@ -70,190 +88,32 @@
     </button>
   </form>
 
-  <button
-    id="submit-selected-symbol-btn"
-    onclick={addToken}
-  >
-    Add
-  </button>
-  <button
-    id="submit-selected-symbol-btn"
-    onclick={deleteToken}
-  >
-    Delete
-  </button>
+  <button onclick={() => chromeStorage.remove(CHROME_STORAGE_KEYS.LIST_TOKEN)}>Remove</button>
 
   <!-- this div is for error message or some notification -->
-  <div class="notification-ui">{JSON.stringify(listToken)}</div>
-
-  <div class="notification-ui">{JSON.stringify(err)}</div>
+  <div class="notification-ui">{JSON.stringify(resData)}</div>
 
   <div class="crypto-listings-container">
     <ul>
-      {#each listToken as token}
+      {#each listToken as token, tokenIndex}
         <li class="crypto-listing-item">
           <div class="crypto-listing-item-content">
             <img
-              src="https://s2.coinmarketcap.com/static/img/coins/200x200/1027.png"
-              alt="DEEP"
+              src={token?.img}
+              alt={token?.symbol}
             />
-            <h3>{token}</h3>
+            <h3>{token?.symbol}</h3>
+            <p class="crypto-listing-item-price">${token?.price.toFixed(4)}</p>
           </div>
-          <p class="crypto-listing-item-price">$100</p>
+          <button
+            class="delete-token-btn"
+            onclick={() => deleteToken(tokenIndex)}>x</button
+          >
         </li>
       {/each}
     </ul>
   </div>
 </div>
 
-<!-- <button onclick={fetchCryptoListings}>Fetch Crypto Listings</button> -->
-<!-- <pre>{JSON.stringify(resData, null, 2)}</pre> -->
-
 <style>
-  /* Container styling */
-  .container {
-    max-width: 480px;
-    padding: 1rem 1.5rem;
-    background: #ebf5fb; /* light background */
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
-    color: #2c3e50; /* dark text */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  /* Heading */
-  .container h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #3498db; /* primary blue */
-    text-align: center;
-    letter-spacing: 1.2px;
-  }
-
-  /* Form container */
-  .form-container {
-    display: flex;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-  }
-
-  /* Input text */
-  .form-container input[type='text'] {
-    flex-grow: 1;
-    padding: 0.6rem 1rem;
-    font-size: 1rem;
-    border: 2px solid #3498db; /* primary blue border */
-    border-radius: 6px;
-    background: white;
-    color: #2c3e50;
-    transition: border-color 0.3s ease;
-  }
-
-  .form-container input[type='text']:focus {
-    outline: none;
-    border-color: #85929e; /* secondary green on focus */
-    box-shadow: 0 0 6px #85929e;
-  }
-
-  /* Submit button */
-  #submit-selected-symbol-btn {
-    background-color: #3498db; /* primary blue */
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 1rem;
-  }
-
-  #submit-selected-symbol-btn:hover {
-    background-color: #2980b9; /* darker blue on hover */
-  }
-
-  /* Notification UI */
-  .notification-ui {
-    min-height: 1.5rem;
-    margin-bottom: 1rem;
-    font-size: 16px;
-    color: #e74c3c; /* red for errors */
-    text-align: center;
-    font-weight: 500;
-  }
-
-  /* Crypto listings container */
-  .crypto-listings-container {
-    background: white;
-    border-radius: 10px;
-    overflow-y: auto;
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
-  }
-
-  /* List styling */
-  .crypto-listings-container ul {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  /* Crypto list item */
-  .crypto-listing-item {
-    display: flex;
-    height: 40px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0rem 1rem;
-    border-bottom: 1px solid #d6eaf8;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-  }
-
-  .crypto-listing-item:last-child {
-    border-bottom: none;
-  }
-
-  .crypto-listing-item:hover {
-    background-color: #85929e; /* secondary green */
-    color: white;
-  }
-
-  /* Content inside list item */
-  .crypto-listing-item-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  /* Crypto image */
-  .crypto-listing-item-content img {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
-  }
-
-  /* Crypto name */
-  .crypto-listing-item-content h3 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  /* Crypto price */
-  .crypto-listing-item-price {
-    font-weight: 500;
-    font-size: 14px;
-    text-align: right;
-    user-select: none;
-  }
-
-  .crypto-listing-item:hover .crypto-listing-item-price {
-    color: white;
-  }
 </style>

@@ -21,7 +21,7 @@ export const chromeStorage = {
       chrome.storage.local.get(keys, items => {
         if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
         if (items[keys]) {
-          resolve(items[keys] as Record<string, T>)
+          resolve(items[keys] as T)
         } else {
           return reject('No items found')
         }
