@@ -1,5 +1,6 @@
 <script lang="ts">
   import { coinmarketcapApi } from '$lib/apis'
+  import { chromeStorage } from '$lib/utils/chrome'
 
   let resData = $state<any | null>(null)
 
@@ -16,25 +17,36 @@
   })
 
   const fetchCryptoListings = async () => {
-    // const res = await coinmarketcapApi.get('/cryptocurrency/quotes/latest', {
-    //   params: {
-    //     symbol: 'DEEP'
-    //   }
-    // })
-    // resData = res
+    const res = await coinmarketcapApi.get('/cryptocurrency/quotes/latest', {
+      params: {
+        symbol: 'DEEP'
+      }
+    })
+    resData = res
   }
 
   const submitSelectedSymbol = (e: Event) => {
     e.preventDefault()
     listToken = [...listToken, selectedSymbol]
     selectedSymbol = ''
+    // chromeStorage.set({ myKey: listToken })
   }
 
-  const addToken = async () => {}
+  const addToken = async () => {
+    // Save a key-value pair
+    try {
+      const myKey = await chromeStorage.get<string[]>('myKey')
+      chromeStorage.set({ myKey: [...myKey, 'selectedSymbol'] }, () => {
+        console.log('Value is set')
+      })
+    } catch (error) {
+      err = error ? error : 'Unknown error'
+    }
+  }
 
   const deleteToken = async () => {
     // await chromeStorage.clear()
-    // listToken = await chromeStorage.get('myKey')
+    listToken = await chromeStorage.get('myKey')
   }
 </script>
 
