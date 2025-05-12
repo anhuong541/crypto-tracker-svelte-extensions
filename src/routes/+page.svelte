@@ -6,9 +6,6 @@
   import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
 
   // TODO: add loading skeleton
-  // TODO: add cache for list token
-  // TODO: check and optimize UI performance
-  // FIXME: fix the error still show old data when remove token
 
   type Token = { price: number; img: string; symbol: string }
   type CacheToken = { token: Token; expireTime: number }
