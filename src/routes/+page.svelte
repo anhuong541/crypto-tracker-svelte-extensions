@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { coinmarketcapApi } from '$lib/apis'
   import { chromeStorage } from '$lib/utils/chrome'
   import '$lib/styles/home.css'
   import { CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
@@ -9,7 +8,6 @@
   // TODO: add loading skeleton
   // TODO: add cache for list token
   // TODO: check and optimize UI performance
-  // FIXME: fix the type error
   // FIXME: fix the error still show old data when remove token
 
   let resData = $state<any | null>(null)
@@ -20,28 +18,16 @@
 
   const updateListToken = async (symbol: string) => {
     const crypto = await getCryptoPrice(symbol)
-    const price = crypto?.data?.[symbol].quote.USD.price
-    const cryptoId = crypto?.data?.[symbol].id
-    const cryptoImg = getCmcImg(cryptoId)
+    if (!crypto) return
+    const price = crypto.data?.[symbol].quote.USD.price
+    const cryptoId = crypto.data?.[symbol].id
+    const cryptoImg = getCmcImg(cryptoId.toString())
     listToken.push({
       price,
       img: cryptoImg,
       symbol
     })
   }
-
-  onMount(async () => {
-    const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_TOKEN)
-    listSymbol = Object.values(store)
-    const crypto = await getCryptoPrice('BTC')
-    const price = crypto?.data?.BTC.quote.USD.price
-    const cryptoId = crypto?.data?.BTC.id
-    const cryptoImg = getCmcImg(cryptoId)
-
-    listSymbol.forEach(async symbol => {
-      await updateListToken(symbol)
-    })
-  })
 
   const updateListSymbolStorage = () => {
     chromeStorage.set({ [CHROME_STORAGE_KEYS.LIST_TOKEN]: listSymbol })
@@ -66,6 +52,14 @@
     listToken = listToken.filter((_, i) => i !== index)
     updateListSymbolStorage()
   }
+
+  onMount(async () => {
+    const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_TOKEN)
+    listSymbol = Object.values(store)
+    listSymbol.forEach(async symbol => {
+      await updateListToken(symbol)
+    })
+  })
 </script>
 
 <div class="container">
@@ -91,7 +85,7 @@
   <button onclick={() => chromeStorage.remove(CHROME_STORAGE_KEYS.LIST_TOKEN)}>Remove</button>
 
   <!-- this div is for error message or some notification -->
-  <div class="notification-ui">{JSON.stringify(resData)}</div>
+  <div class="notification-ui">{resData && JSON.stringify(resData)}</div>
 
   <div class="crypto-listings-container">
     <ul>
