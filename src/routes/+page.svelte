@@ -132,7 +132,7 @@
         onclick={logout}
         class="logout-btn"
       >
-        Logout
+        x
       </button>
     </div>
 

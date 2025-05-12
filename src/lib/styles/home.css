@@ -31,14 +31,12 @@
 }
 
 .logout-btn {
-  background-color: #2980b9; /* darker blue on hover */
   border: none;
-  color: white;
+  color: red;
+  background-color: transparent;
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
   font-size: 1rem;
 }
 
