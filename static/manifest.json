@@ -10,14 +10,14 @@
     "default_title": "Crypto Tracker",
     "default_description": "Tracking crypto prices using coinmarketcap API",
     "default_icon": {
-      "16": "icons/coinmarketcap-icon-16.png",
-      "48": "icons/coinmarketcap-icon-48.png",
-      "128": "icons/coinmarketcap-icon-28.png"
+      "16": "icons/coinmarketcap_icon_16.png",
+      "48": "icons/coinmarketcap_icon_48.png",
+      "128": "icons/coinmarketcap_icon_128.png"
     }
   },
   "icons": {
-    "16": "icons/coinmarketcap-icon-16.png",
-    "48": "icons/coinmarketcap-icon-48.png",
-    "128": "icons/coinmarketcap-icon-28.png"
+    "16": "icons/coinmarketcap_icon_16.png",
+    "48": "icons/coinmarketcap_icon_48.png",
+    "128": "icons/coinmarketcap_icon_128.png"
   }
 }
