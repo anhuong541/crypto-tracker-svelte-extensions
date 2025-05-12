@@ -1,9 +1,18 @@
 import { coinmarketcapApi } from '$lib/apis'
+import { CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
 import type { CryptoListing } from '$lib/types/coinmarketcap'
+import { chromeStorage } from '$lib/utils/chrome'
 
 export const getCryptoPrice = async (symbol: string): Promise<CryptoListing> => {
+  const apiKey = await chromeStorage.get<string>(CHROME_STORAGE_KEYS.API_KEY)
+  if (!apiKey) {
+    throw new Error('No API key found')
+  }
   return await coinmarketcapApi.get('/cryptocurrency/quotes/latest', {
-    params: { symbol }
+    params: { symbol },
+    headers: {
+      'X-CMC_PRO_API_KEY': apiKey
+    }
   })
 }
 

@@ -1,8 +1,12 @@
+:root {
+  --primary-color: linear-gradient(rgb(56, 97, 251) 0%, rgb(56, 97, 251) 100%);
+}
+
 /* Container styling */
 .container {
   max-width: 480px;
-  padding: 1rem 1.5rem;
-  background: #ebf5fb; /* light background */
+  padding: 1rem;
+  background: #f8fdff; /* light background */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
   color: #2c3e50; /* dark text */
@@ -11,12 +15,54 @@
 
 /* Heading */
 .container h1 {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #3498db; /* primary blue */
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: rgb(54, 92, 227); /* primary blue */
   text-align: center;
   letter-spacing: 1.2px;
+  display: flex;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: #2980b9; /* darker blue on hover */
+  border: none;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.form-container-api-key {
+  margin-bottom: 1rem;
+}
+
+.form-container-api-key input[type='text'] {
+  flex-grow: 1;
+  padding: 0.3rem 0.8rem;
+  font-size: 1rem;
+  border: 2px solid rgb(84, 121, 255); /* primary blue border */
+  border-radius: 6px;
+  background: white;
+  color: #2c3e50;
+  transition: border-color 0.3s ease;
+  margin-bottom: 0.25rem;
+  width: 200px;
+}
+
+.form-container-api-key input[type='text']:focus {
+  outline: none;
+  border-color: rgb(121, 190, 255); /* secondary green on focus */
+  box-shadow: 0 0 6px rgb(121, 190, 255);
 }
 
 /* Form container */
@@ -29,9 +75,9 @@
 /* Input text */
 .form-container input[type='text'] {
   flex-grow: 1;
-  padding: 0.6rem 1rem;
+  padding: 0.3rem 0.8rem;
   font-size: 1rem;
-  border: 2px solid #3498db; /* primary blue border */
+  border: 2px solid rgb(84, 121, 255); /* primary blue border */
   border-radius: 6px;
   background: white;
   color: #2c3e50;
@@ -40,21 +86,21 @@
 
 .form-container input[type='text']:focus {
   outline: none;
-  border-color: #85929e; /* secondary green on focus */
-  box-shadow: 0 0 6px #85929e;
+  border-color: rgb(121, 190, 255); /* secondary green on focus */
+  box-shadow: 0 0 6px rgb(121, 190, 255);
 }
 
 /* Submit button */
 #submit-selected-symbol-btn {
-  background-color: #3498db; /* primary blue */
+  background: var(--primary-color);
   border: none;
   color: white;
-  font-weight: 600;
-  padding: 0 1rem;
+  font-weight: 500;
+  padding: 4px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: 1rem;
+  font-size: 14px;
 }
 
 #submit-selected-symbol-btn:hover {
@@ -64,7 +110,7 @@
 /* Notification UI */
 .notification-ui {
   min-height: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   font-size: 16px;
   color: #e74c3c; /* red for errors */
   text-align: center;
