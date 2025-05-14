@@ -6,10 +6,9 @@ A Chrome extension built with SvelteKit for tracking cryptocurrency prices in re
 
 ## Features
 
-- Real-time cryptocurrency price tracking
-- Uses the CoinMarketCap API for accurate data
-- Clean and intuitive user interface built with SvelteKit
-- Local storage for saving user preferences
+- Automatically updates data every time you open the extension
+- Powered by the CoinMarketCap API for accurate market data
+- Built with Svelte for high performance
 
 ## Getting Started
 
