@@ -4,11 +4,8 @@
   import { cacheTokenTime, CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
   import { onMount } from 'svelte'
   import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
-
-  // TODO: add loading skeleton
-
-  type Token = { price: number; img: string; symbol: string }
-  type CacheToken = { token: Token; expireTime: number }
+  import type { CacheToken, Token } from '$lib/types/coinmarketcap'
+  import { formatCurrency } from '$lib/utils/currency'
 
   let haveApiKey = $state(true)
   let apiKey = $state('')
@@ -53,9 +50,10 @@
 
   const submitSelectedSymbol = async (e: Event) => {
     e.preventDefault()
-    listSymbol = [...listSymbol, selectedSymbol]
+    const symbol = selectedSymbol.toUpperCase()
+    listSymbol = [...listSymbol, symbol]
     updateListSymbolStorage()
-    await updateListToken(selectedSymbol)
+    await updateListToken(symbol)
     selectedSymbol = ''
   }
 
@@ -79,11 +77,9 @@
 
   onMount(async () => {
     haveApiKey = await getAPIKey()
-    // console.log({ haveApiKey })
     if (!haveApiKey) {
       return
     }
-    // console.log('it trigger true!!!')
     const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_SYMBOL)
     listSymbol = Object.values(store)
     // check cache token and update by list symbol
@@ -163,7 +159,9 @@
                 alt={token?.symbol}
               />
               <h3>{token?.symbol}</h3>
-              <p class="crypto-listing-item-price">${token?.price.toFixed(4)}</p>
+              <p class="crypto-listing-item-price">
+                {formatCurrency(token?.price)}
+              </p>
             </div>
             <button
               class="delete-token-btn"
