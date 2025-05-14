@@ -53,10 +53,10 @@
     e.preventDefault()
     const symbol = selectedSymbol.trim().toUpperCase()
     listSymbol = [...listSymbol, symbol]
+    selectedSymbol = ''
     await updateListToken(symbol)
       .then(() => {
         updateListSymbolStorage()
-        selectedSymbol = ''
       })
       .catch(() => {
         error = 'Invalid symbol'
