@@ -1,38 +1,91 @@
-# sv
+# Crypto Tracker Chrome Extension
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A Chrome extension built with SvelteKit for tracking cryptocurrency prices in real-time using the CoinMarketCap API.
 
-## Creating a project
+![Crypto Tracker](static/icons/coinmarketcap_icon_128.png)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
+- Real-time cryptocurrency price tracking
+- Uses the CoinMarketCap API for accurate data
+- Clean and intuitive user interface built with SvelteKit
+- Local storage for saving user preferences
+
+## Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) installed on your machine
+- A modern web browser (Chrome recommended for extension testing)
+
+### Installation
+
+1. Clone this repository:
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+git clone https://github.com/anhuong541/crypto-tracker-svelte-extensions.git
+cd crypto-tracker-svelte-extension
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+2. Install dependencies:
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun install
 ```
 
-## Building
-
-To create a production version of your app:
-
+3. Build the extension:
 ```bash
-npm run build
+bun run build
 ```
 
-You can preview the production build with `npm run preview`.
+This will generate a `build` directory containing the extension files.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+### Development
+
+To start development with hot-reloading:
+
+```bash
+bun run dev
+```
+
+To build and watch for changes:
+
+```bash
+bun run build:watch
+```
+
+## Loading the Extension in Chrome
+
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer Mode" by toggling the switch in the top-right corner
+3. Click "Load unpacked" and select the `build` directory from this project
+4. The extension should now appear in your Chrome toolbar
+
+## Project Structure
+
+- `src/` - SvelteKit source code
+  - `routes/` - Page components and API routes
+  - `lib/` - Reusable components and utilities
+- `static/` - Static assets including extension manifest and icons
+- `build/` - Generated extension bundle (after building)
+
+## Technology Stack
+
+- [SvelteKit](https://kit.svelte.dev/) - Frontend framework
+- [sveltekit-adapter-chrome-extension](https://github.com/michmich112/sveltekit-adapter-chrome-extension) - SvelteKit adapter for Chrome extensions
+- [Bun](https://bun.sh/) - JavaScript runtime and package manager
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+
+## Building for Production
+
+```bash
+bun run build
+```
+
+The production-ready extension will be in the `build` directory.
+
+## License
+
+This project is licensed under the terms of the license included in the repository.
+
+## Author
+
+Huong Nguyen - https://github.com/anhuong541
