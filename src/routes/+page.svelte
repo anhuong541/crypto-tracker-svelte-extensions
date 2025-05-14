@@ -12,6 +12,7 @@
   let selectedSymbol = $state('')
   let listToken = $state<{ price: number; img: string; symbol: string }[]>([])
   let listSymbol = $state<string[]>([])
+  let error = $state('')
 
   const updateListToken = async (symbol: string) => {
     const crypto = await getCryptoPrice(symbol)
@@ -50,11 +51,17 @@
 
   const submitSelectedSymbol = async (e: Event) => {
     e.preventDefault()
-    const symbol = selectedSymbol.toUpperCase()
+    const symbol = selectedSymbol.trim().toUpperCase()
     listSymbol = [...listSymbol, symbol]
-    updateListSymbolStorage()
     await updateListToken(symbol)
-    selectedSymbol = ''
+      .then(() => {
+        updateListSymbolStorage()
+        selectedSymbol = ''
+      })
+      .catch(() => {
+        error = 'Invalid symbol'
+        listSymbol.pop()
+      })
   }
 
   const submitApiKey = async (e: Event) => {
@@ -64,9 +71,9 @@
     apiKey = ''
   }
 
-  const deleteToken = (index: number) => {
-    listSymbol = listSymbol.filter((_, i) => i !== index)
-    listToken = listToken.filter((_, i) => i !== index)
+  const deleteToken = (symbol: string) => {
+    listSymbol = listSymbol.filter(s => s !== symbol)
+    listToken = listToken.filter(t => t.symbol !== symbol)
     updateListSymbolStorage()
   }
 
@@ -83,19 +90,21 @@
     const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_SYMBOL)
     listSymbol = Object.values(store)
     // check cache token and update by list symbol
-    listSymbol.forEach(async symbol => {
-      const key = `${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`
-      const { token, expireTime } = await chromeStorage.get<CacheToken>(key)
-      if (token && expireTime) {
-        if (expireTime < Date.now()) {
-          await updateListToken(symbol)
+    await Promise.all(
+      listSymbol.map(async symbol => {
+        const key = `${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`
+        const { token, expireTime } = await chromeStorage.get<CacheToken>(key)
+        if (token && expireTime) {
+          if (expireTime < Date.now()) {
+            await updateListToken(symbol)
+          } else {
+            listToken.push(token)
+          }
         } else {
-          listToken.push(token)
+          await updateListToken(symbol)
         }
-      } else {
-        await updateListToken(symbol)
-      }
-    })
+      })
+    )
   })
 </script>
 
@@ -146,8 +155,9 @@
       </button>
     </form>
 
-    <!-- this div is for error message or some notification -->
-    <!-- <div class="notification-ui">{debug && JSON.stringify(debug)}</div> -->
+    {#if !!error}
+      <div class="notification-ui">{error}</div>
+    {/if}
 
     <div class="crypto-listings-container">
       <ul>
@@ -165,7 +175,7 @@
             </div>
             <button
               class="delete-token-btn"
-              onclick={() => deleteToken(tokenIndex)}>x</button
+              onclick={() => deleteToken(token.symbol)}>x</button
             >
           </li>
         {/each}
