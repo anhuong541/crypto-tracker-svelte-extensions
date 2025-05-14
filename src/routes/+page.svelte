@@ -68,6 +68,7 @@
     e.preventDefault()
     await chromeStorage.set({ [CHROME_STORAGE_KEYS.API_KEY]: apiKey })
     haveApiKey = true
+    await startFetchListTokens()
     apiKey = ''
   }
 
@@ -80,13 +81,11 @@
   const logout = async () => {
     await chromeStorage.set({ [CHROME_STORAGE_KEYS.API_KEY]: '' })
     haveApiKey = false
+    listToken = []
+    listSymbol = []
   }
 
-  onMount(async () => {
-    haveApiKey = await getAPIKey()
-    if (!haveApiKey) {
-      return
-    }
+  const startFetchListTokens = async () => {
     const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_SYMBOL)
     listSymbol = Object.values(store)
     // check cache token and update by list symbol
@@ -105,6 +104,15 @@
         }
       })
     )
+  }
+
+  onMount(async () => {
+    haveApiKey = await getAPIKey()
+    console.log(haveApiKey)
+    if (!haveApiKey) {
+      return
+    }
+    await startFetchListTokens()
   })
 </script>
 
