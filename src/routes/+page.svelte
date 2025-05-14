@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { chromeStorage } from '$lib/utils/chrome'
   import '$lib/styles/home.css'
+  import { chromeStorage } from '$lib/utils/chrome'
   import { cacheTokenTime, CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
   import { onMount } from 'svelte'
   import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
@@ -114,6 +114,7 @@
       onsubmit={submitApiKey}
       class="form-container-api-key"
     >
+      <h2>Coinmarketcap Tracker</h2>
       <input
         type="text"
         bind:value={apiKey}
@@ -134,7 +135,7 @@
         onclick={logout}
         class="logout-btn"
       >
-        x
+        <span>×</span>
       </button>
     </div>
 
@@ -151,7 +152,7 @@
         type="submit"
         id="submit-selected-symbol-btn"
       >
-        Submit
+        Add
       </button>
     </form>
 
@@ -160,29 +161,42 @@
     {/if}
 
     <div class="crypto-listings-container">
-      <ul>
-        {#each listToken as token, tokenIndex}
-          <li class="crypto-listing-item">
-            <div class="crypto-listing-item-content">
-              <img
-                src={token?.img}
-                alt={token?.symbol}
-              />
-              <h3>{token?.symbol}</h3>
-              <p class="crypto-listing-item-price">
-                {formatCurrency(token?.price)}
-              </p>
-            </div>
-            <button
-              class="delete-token-btn"
-              onclick={() => deleteToken(token.symbol)}>x</button
-            >
-          </li>
-        {/each}
-      </ul>
+      {#if listToken.length === 0}
+        <div class="empty-state">No cryptocurrencies added yet. Add your first one above!</div>
+      {:else}
+        <ul>
+          {#each listToken as token}
+            <li class="crypto-listing-item">
+              <div class="crypto-listing-item-content">
+                <img
+                  src={token?.img}
+                  alt={token?.symbol}
+                />
+                <h3>{token?.symbol}</h3>
+                <p class="crypto-listing-item-price">
+                  ${formatCurrency(token?.price)}
+                </p>
+              </div>
+              <button
+                class="delete-token-btn"
+                onclick={() => deleteToken(token.symbol)}>×</button
+              >
+            </li>
+          {/each}
+        </ul>
+      {/if}
     </div>
   {/if}
 </div>
 
 <style>
+  /* Extension-specific styles */
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    width: 320px; /* Standard width for extension popups */
+    max-height: 600px; /* Maximum height for extension popups */
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 </style>

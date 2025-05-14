@@ -1,186 +1,242 @@
-:root {
-  --primary-color: linear-gradient(rgb(56, 97, 251) 0%, rgb(56, 97, 251) 100%);
-}
-
-/* Container styling */
+/* Main container */
 .container {
-  max-width: 480px;
-  padding: 1rem;
-  background: #f8fdff; /* light background */
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
-  color: #2c3e50; /* dark text */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: #f8f9fa;
 }
 
-/* Heading */
-.container h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: rgb(54, 92, 227); /* primary blue */
-  text-align: center;
-  letter-spacing: 1.2px;
-  display: flex;
-}
-
+/* Header styling */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e1e5ea;
 }
 
-.logout-btn {
-  border: none;
-  color: red;
-  background-color: transparent;
-  font-weight: 500;
-  padding: 0.5rem;
-  cursor: pointer;
-  font-size: 1rem;
+h1 {
+  color: #3861fb; /* Coinmarketcap blue */
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+h2 {
+  color: #3861fb;
+  text-align: center;
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+/* Form styling */
+.form-container,
+.form-container-api-key {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .form-container-api-key {
-  margin-bottom: 1rem;
-}
-
-.form-container-api-key input[type='text'] {
-  flex-grow: 1;
-  padding: 0.3rem 0.8rem;
-  font-size: 1rem;
-  border: 2px solid rgb(84, 121, 255); /* primary blue border */
-  border-radius: 6px;
-  background: white;
-  color: #2c3e50;
-  transition: border-color 0.3s ease;
-  margin-bottom: 0.25rem;
-  width: 200px;
-}
-
-.form-container-api-key input[type='text']:focus {
-  outline: none;
-  border-color: rgb(121, 190, 255); /* secondary green on focus */
-  box-shadow: 0 0 6px rgb(121, 190, 255);
-}
-
-/* Form container */
-.form-container {
-  display: flex;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-/* Input text */
-.form-container input[type='text'] {
-  flex-grow: 1;
-  padding: 0.3rem 0.8rem;
-  font-size: 1rem;
-  border: 2px solid rgb(84, 121, 255); /* primary blue border */
-  border-radius: 6px;
-  background: white;
-  color: #2c3e50;
-  transition: border-color 0.3s ease;
-}
-
-.form-container input[type='text']:focus {
-  outline: none;
-  border-color: rgb(121, 190, 255); /* secondary green on focus */
-  box-shadow: 0 0 6px rgb(121, 190, 255);
-}
-
-/* Submit button */
-#submit-selected-symbol-btn {
-  background: var(--primary-color);
-  border: none;
-  color: white;
-  font-weight: 500;
-  padding: 4px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 14px;
-}
-
-#submit-selected-symbol-btn:hover {
-  background-color: #2980b9; /* darker blue on hover */
-}
-
-/* Notification UI */
-.notification-ui {
-  min-height: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 16px;
-  color: #e74c3c; /* red for errors */
-  text-align: center;
-  font-weight: 500;
-}
-
-/* Crypto listings container */
-.crypto-listings-container {
-  background: white;
-  border-radius: 10px;
-  overflow-y: auto;
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
-}
-
-/* List styling */
-.crypto-listings-container ul {
-  display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #d1d9e6;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #3861fb;
+}
+
+button {
+  background-color: #1877f2; /* Facebook blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s;
+}
+
+button:hover {
+  background-color: #0d6efd;
+}
+
+/* Notification */
+.notification-ui {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.3s;
+}
+
+/* Crypto listings */
+.crypto-listings-container {
+  margin-top: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.empty-state {
+  text-align: center;
+  color: #6c757d;
+  padding: 15px 0;
+  font-size: 13px;
+}
+
+ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  overflow: hidden;
 }
 
-/* Crypto list item */
 .crypto-listing-item {
   display: flex;
-  height: 40px;
   justify-content: space-between;
   align-items: center;
-  padding: 0rem 1rem;
-  border-bottom: 1px solid #d6eaf8;
+  padding: 8px 10px;
+  background-color: white;
   border-radius: 6px;
-  transition: background-color 0.2s ease;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
-.crypto-listing-item:last-child {
-  border-bottom: none;
+.crypto-listing-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Content inside list item */
 .crypto-listing-item-content {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
 }
 
-/* Crypto image */
-.crypto-listing-item-content img {
-  width: 20px;
-  height: 20px;
+.crypto-listing-item img {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
 }
 
-/* Crypto name */
-.crypto-listing-item-content h3 {
+.crypto-listing-item h3 {
   margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
+  color: #212529;
 }
 
-/* Crypto price */
 .crypto-listing-item-price {
-  font-weight: 500;
+  margin: 0;
   font-size: 14px;
+  font-weight: 500;
+  color: #3861fb;
 }
 
 .delete-token-btn {
-  border: none;
   background-color: transparent;
+  color: #6c757d;
+  border: none;
+  font-size: 16px;
+  padding: 2px 6px;
   cursor: pointer;
-  font-size: 1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.delete-token-btn:hover {
+  color: #dc3545;
+  background-color: white;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #6c757d;
+  border: none;
+  font-size: 16px;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.logout-btn:hover {
+  color: #3861fb;
+  background-color: #e1e5ea;
+}
+
+/* Scrollbar styling for the extension */
+.crypto-listings-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.crypto-listings-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.crypto-listings-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.crypto-listings-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+  }
+
+  .form-container {
+    flex-direction: column;
+  }
+
+  .crypto-listing-item-content {
+    gap: 10px;
+  }
 }
