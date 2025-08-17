@@ -50,5 +50,5 @@ export type CryptoListing = {
   }
 }
 
-export type Token = { price: number; img: string; symbol: string }
+export type Token = { price: number; img: string; symbol: string; slug: string }
 export type CacheToken = { token: Token; expireTime: number }

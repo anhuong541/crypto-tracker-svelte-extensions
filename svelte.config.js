@@ -18,9 +18,9 @@ const config = {
       $lib: 'src/lib',
       $utils: 'src/utils',
       $components: 'src/components',
-      $chrome: 'src/utils/chrome'
-    }
-  }
+      $chrome: 'src/utils/chrome',
+    },
+  },
 }
 
 export default config

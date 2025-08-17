@@ -1,18 +1,32 @@
 <script lang="ts">
-  import '$lib/styles/home.css'
+  import { tick } from 'svelte'
   import { chromeStorage } from '$lib/utils/chrome'
   import { cacheTokenTime, CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
-  import { onMount } from 'svelte'
   import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
   import type { CacheToken, Token } from '$lib/types/coinmarketcap'
-  import { formatCurrency } from '$lib/utils/currency'
+  import { isValidCMCKey } from '$lib/utils/currency'
+  import { getAPIKey } from '$lib/chrome'
+  import { Header, ApiKeyForm, SymbolForm, CryptoList, Notification } from '$lib/components/ui'
 
   let haveApiKey = $state(true)
-  let apiKey = $state('')
-  let selectedSymbol = $state('')
-  let listToken = $state<{ price: number; img: string; symbol: string }[]>([])
+  let listToken = $state<Token[]>([])
   let listSymbol = $state<string[]>([])
   let error = $state('')
+  let isLoading = $state(false)
+
+  tick().then(async () => {
+    let key = ''
+    try {
+      key = await getAPIKey()
+      haveApiKey = !!key
+    } catch (error) {
+      console.log('debug', error)
+      haveApiKey = false
+    }
+    if (haveApiKey) {
+      await startFetchListTokens()
+    }
+  })
 
   const updateListToken = async (symbol: string) => {
     const crypto = await getCryptoPrice(symbol)
@@ -22,20 +36,13 @@
     const cryptoImg = getCmcImg(cryptoId.toString())
     const token = {
       price,
+      symbol,
       img: cryptoImg,
-      symbol
+      slug: crypto.data?.[symbol].slug,
     }
-    listToken.push(token)
-    updateListTokenStorage(symbol, token)
-  }
 
-  const getAPIKey = async () => {
-    try {
-      const apiKey = await chromeStorage.get<string>(CHROME_STORAGE_KEYS.API_KEY)
-      return !!apiKey
-    } catch {
-      return false
-    }
+    listToken = [...listToken, token]
+    updateListTokenStorage(symbol, token)
   }
 
   const updateListSymbolStorage = async () => {
@@ -45,40 +52,50 @@
   const updateListTokenStorage = async (symbol: string, token: Token) => {
     const expireTime = Date.now() + cacheTokenTime
     await chromeStorage.set({
-      [`${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`]: { token, expireTime }
+      [`${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`]: { token, expireTime },
     })
   }
 
-  const submitSelectedSymbol = async (e: Event) => {
-    e.preventDefault()
-    const symbol = selectedSymbol.trim().toUpperCase()
-    listSymbol = [...listSymbol, symbol]
-    selectedSymbol = ''
-    await updateListToken(symbol)
-      .then(() => {
-        updateListSymbolStorage()
-      })
-      .catch(() => {
-        error = 'Invalid symbol'
-        listSymbol.pop()
-      })
+  const handleSymbolSubmit = async (symbol: string) => {
+    error = ''
+    isLoading = true
+    try {
+      listSymbol = [...listSymbol, symbol]
+      await updateListToken(symbol)
+      await updateListSymbolStorage()
+    } catch (err) {
+      error = 'Invalid symbol'
+      listSymbol = listSymbol.filter(s => s !== symbol)
+    } finally {
+      isLoading = false
+    }
   }
 
-  const submitApiKey = async (e: Event) => {
-    e.preventDefault()
-    await chromeStorage.set({ [CHROME_STORAGE_KEYS.API_KEY]: apiKey })
-    haveApiKey = true
-    await startFetchListTokens()
-    apiKey = ''
+  const handleApiKeySubmit = async (apiKey: string) => {
+    error = ''
+    isLoading = true
+    try {
+      if (isValidCMCKey(apiKey)) {
+        await chromeStorage.set({ [CHROME_STORAGE_KEYS.API_KEY]: apiKey })
+        haveApiKey = true
+        await startFetchListTokens()
+      } else {
+        error = 'Invalid API key'
+      }
+    } catch (err) {
+      error = 'Failed to save API key'
+    } finally {
+      isLoading = false
+    }
   }
 
-  const deleteToken = (symbol: string) => {
+  const handleDeleteToken = (symbol: string) => {
     listSymbol = listSymbol.filter(s => s !== symbol)
     listToken = listToken.filter(t => t.symbol !== symbol)
     updateListSymbolStorage()
   }
 
-  const logout = async () => {
+  const handleLogout = async () => {
     await chromeStorage.set({ [CHROME_STORAGE_KEYS.API_KEY]: '' })
     haveApiKey = false
     listToken = []
@@ -86,114 +103,60 @@
   }
 
   const startFetchListTokens = async () => {
-    const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_SYMBOL)
-    listSymbol = Object.values(store)
-    // check cache token and update by list symbol
-    await Promise.all(
-      listSymbol.map(async symbol => {
-        const key = `${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`
-        const { token, expireTime } = await chromeStorage.get<CacheToken>(key)
-        if (token && expireTime) {
-          if (expireTime < Date.now()) {
-            await updateListToken(symbol)
+    try {
+      const store = await chromeStorage.get<string[]>(CHROME_STORAGE_KEYS.LIST_SYMBOL)
+      listSymbol = Object.values(store)
+      // check cache token and update by list symbol
+      await Promise.all(
+        listSymbol.map(async symbol => {
+          const key = `${CHROME_STORAGE_KEYS.CACHE_TOKEN_}${symbol}`
+          const { token, expireTime } = await chromeStorage.get<CacheToken>(key)
+          if (token && expireTime) {
+            if (expireTime < Date.now()) {
+              await updateListToken(symbol)
+            } else {
+              listToken.push(token)
+            }
           } else {
-            listToken.push(token)
+            await updateListToken(symbol)
           }
-        } else {
-          await updateListToken(symbol)
-        }
-      })
-    )
-  }
-
-  onMount(async () => {
-    haveApiKey = await getAPIKey()
-    console.log(haveApiKey)
-    if (!haveApiKey) {
-      return
+        }),
+      )
+    } catch (error) {
+      console.log('error when fetch list token: ', error)
     }
-    await startFetchListTokens()
-  })
+  }
 </script>
 
 <div class="container">
   {#if !haveApiKey}
-    <form
-      onsubmit={submitApiKey}
-      class="form-container-api-key"
-    >
-      <h2>Coinmarketcap Tracker</h2>
-      <input
-        type="text"
-        bind:value={apiKey}
-        placeholder="Enter your Coinmarketcap API Key"
-      />
-      <button
-        type="submit"
-        id="submit-selected-symbol-btn"
-      >
-        Add Coinmarketcap API Key
-      </button>
-    </form>
+    <ApiKeyForm
+      title="Coinmarketcap Tracker"
+      onSubmit={handleApiKeySubmit}
+      {error}
+      {isLoading}
+    />
   {:else}
-    <div class="header-container">
-      <h1>Coinmarketcap</h1>
+    <Header
+      title="Coinmarketcap"
+      onLogout={handleLogout}
+      showLogout={true}
+    />
 
-      <button
-        onclick={logout}
-        class="logout-btn"
-      >
-        <span>×</span>
-      </button>
-    </div>
+    <SymbolForm
+      onSubmit={handleSymbolSubmit}
+      {isLoading}
+    />
 
-    <form
-      onsubmit={submitSelectedSymbol}
-      class="form-container"
-    >
-      <input
-        type="text"
-        bind:value={selectedSymbol}
-        placeholder="Enter a crypto symbol"
-      />
-      <button
-        type="submit"
-        id="submit-selected-symbol-btn"
-      >
-        Add
-      </button>
-    </form>
+    <Notification
+      message={error}
+      show={!!error}
+    />
 
-    {#if !!error}
-      <div class="notification-ui">{error}</div>
-    {/if}
-
-    <div class="crypto-listings-container">
-      {#if listToken.length === 0}
-        <div class="empty-state">No cryptocurrencies added yet. Add your first one above!</div>
-      {:else}
-        <ul>
-          {#each listToken as token}
-            <li class="crypto-listing-item">
-              <div class="crypto-listing-item-content">
-                <img
-                  src={token?.img}
-                  alt={token?.symbol}
-                />
-                <h3>{token?.symbol}</h3>
-                <p class="crypto-listing-item-price">
-                  ${formatCurrency(token?.price)}
-                </p>
-              </div>
-              <button
-                class="delete-token-btn"
-                onclick={() => deleteToken(token.symbol)}>×</button
-              >
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
+    <CryptoList
+      tokens={listToken}
+      onDeleteToken={handleDeleteToken}
+    />
   {/if}
 </div>
 
@@ -206,5 +169,12 @@
     max-height: 600px; /* Maximum height for extension popups */
     overflow-x: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    background-color: #f8f9fa;
   }
 </style>

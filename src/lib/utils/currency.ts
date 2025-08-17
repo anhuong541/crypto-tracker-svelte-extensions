@@ -10,7 +10,7 @@
  */
 export function formatCurrency(
   value: number,
-  { currencySymbol = '', decimalSeparator = '.', thousandSeparator = ',' } = {}
+  { currencySymbol = '', decimalSeparator = '.', thousandSeparator = ',' } = {},
 ) {
   if (typeof value !== 'number' || isNaN(value)) {
     return ''
@@ -44,4 +44,11 @@ export function formatCurrency(
     : formattedIntegerPart
 
   return `${sign}${currencySymbol}${formattedNumber}`
+}
+
+export function isValidCMCKey(apiKey: string): boolean {
+  const hex32 = /^[a-fA-F0-9]{32}$/
+  const uuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+
+  return hex32.test(apiKey) || uuid.test(apiKey)
 }

@@ -68,12 +68,12 @@ export const chromeStorage = {
   },
 
   listen: (
-    callback: (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => void
+    callback: (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => void,
   ): void => {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'local') {
         callback(changes, areaName)
       }
     })
-  }
+  },
 }

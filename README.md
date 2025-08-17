@@ -20,17 +20,20 @@ A Chrome extension built with SvelteKit for tracking cryptocurrency prices in re
 ### Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/anhuong541/crypto-tracker-svelte-extensions.git
 cd crypto-tracker-svelte-extension
 ```
 
 2. Install dependencies:
+
 ```bash
 bun install
 ```
 
 3. Build the extension:
+
 ```bash
 bun run build
 ```

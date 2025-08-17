@@ -30,7 +30,7 @@ class ApiClient {
   private async request<T>(
     method: HttpMethod,
     url: string,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ): Promise<T> {
     const { params, headers, body, ...restOptions } = options
 
@@ -41,7 +41,7 @@ class ApiClient {
       method,
       headers: finalHeaders,
       body: body ? JSON.stringify(body) : undefined,
-      ...restOptions
+      ...restOptions,
     })
 
     const contentType = response.headers.get('Content-Type')
@@ -51,7 +51,7 @@ class ApiClient {
         ? await response.json()
         : await response.text()
       throw new Error(
-        `HTTP error! status: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`
+        `HTTP error! status: ${response.status} ${response.statusText}. ${JSON.stringify(errorData)}`,
       )
     }
 
