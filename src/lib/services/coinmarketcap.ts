@@ -4,7 +4,6 @@ import type { CryptoListing, Token } from '$lib/types/coinmarketcap'
 
 export const getCryptoPrice = async (symbol: string): Promise<CryptoListing> => {
   const apiKey = await getAPIKey()
-  console.log({ apiKey })
   return await coinmarketcapApi.get('/cryptocurrency/quotes/latest', {
     params: { symbol },
     headers: {

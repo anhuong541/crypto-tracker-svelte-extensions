@@ -1,12 +1,12 @@
 <script lang="ts">
   import { tick } from 'svelte'
   import { chromeStorage } from '$lib/utils/chrome'
-  import { cacheTokenTime, CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
+  import { Header, ApiKeyForm, SymbolForm, CryptoList, Notification } from '$lib/components/ui'
   import { getCmcImg, getCryptoPrice } from '$lib/services/coinmarketcap'
   import type { CacheToken, Token } from '$lib/types/coinmarketcap'
+  import { cacheTokenTime, CHROME_STORAGE_KEYS } from '$lib/constants/chrome.storage'
   import { isValidCMCKey } from '$lib/utils/currency'
   import { getAPIKey } from '$lib/chrome'
-  import { Header, ApiKeyForm, SymbolForm, CryptoList, Notification } from '$lib/components/ui'
 
   let haveApiKey = $state(true)
   let listToken = $state<Token[]>([])
@@ -133,7 +133,7 @@
     <ApiKeyForm
       title="Coinmarketcap Tracker"
       onSubmit={handleApiKeySubmit}
-      {error}
+      error={error || ''}
       {isLoading}
     />
   {:else}

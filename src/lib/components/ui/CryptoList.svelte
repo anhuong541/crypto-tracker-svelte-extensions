@@ -3,11 +3,11 @@
   import type { Token } from '$lib/types/coinmarketcap'
 
   interface Props {
-    tokens: Token[]
     onDeleteToken: (symbol: string) => void
+    tokens: Token[]
   }
 
-  let { tokens, onDeleteToken }: Props = $props()
+  let { onDeleteToken, tokens }: Props = $props()
 </script>
 
 <div class="crypto-list-container">
